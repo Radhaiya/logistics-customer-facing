@@ -1,6 +1,5 @@
+import { API_URL } from '../config'
 import { useAuthStore } from '../stores/useAuthStore'
-
-const API_URL = import.meta.env.VITE_API_URL || ''
 
 export class ApiError extends Error {
   status: number
