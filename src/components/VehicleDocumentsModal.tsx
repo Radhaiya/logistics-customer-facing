@@ -18,6 +18,7 @@ import {
   IconAlertTriangle,
   IconDownload,
   IconFileDescription,
+  IconPlus,
   IconTrash,
   IconUpload,
 } from '@tabler/icons-react'
@@ -30,6 +31,18 @@ import {
 import { EmptyState, ErrorState, LoadingState } from './Feedback'
 
 const documentTypes = ['PUC', 'INSURANCE', 'RC', 'FITNESS', 'PERMIT', 'OTHER']
+
+type DocumentFileRow = {
+  id: string
+  file: File | null
+}
+
+function createDocumentFileRow(): DocumentFileRow {
+  return {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    file: null,
+  }
+}
 
 type VehicleDocumentsModalProps = {
   vehicleId: number
@@ -49,22 +62,33 @@ export function VehicleDocumentsModal({
   const deleteDocument = useDeleteVehicleDocument()
   const [documentType, setDocumentType] = useState('PUC')
   const [documentName, setDocumentName] = useState('')
-  const [file, setFile] = useState<File | null>(null)
+  const [fileRows, setFileRows] = useState<DocumentFileRow[]>(() => [createDocumentFileRow()])
   const [expiryDate, setExpiryDate] = useState('')
+  const selectedFiles = fileRows.map((row) => row.file).filter((file): file is File => Boolean(file))
+
+  const addFileRow = () => setFileRows((rows) => [...rows, createDocumentFileRow()])
+
+  const updateFileRow = (id: string, file: File | null) => {
+    setFileRows((rows) => rows.map((row) => (row.id === id ? { ...row, file } : row)))
+  }
+
+  const removeFileRow = (id: string) => {
+    setFileRows((rows) => (rows.length === 1 ? rows : rows.filter((row) => row.id !== id)))
+  }
 
   const handleUpload = async () => {
-    if (!file) return
+    if (!selectedFiles.length) return
 
     try {
       await uploadDocument.mutateAsync({
         vehicleId,
         documentType,
         documentName: documentName.trim() || undefined,
-        file,
+        files: selectedFiles,
         expiryDate: expiryDate || undefined,
         scope,
       })
-      setFile(null)
+      setFileRows([createDocumentFileRow()])
       setDocumentName('')
       setExpiryDate('')
     } catch {
@@ -113,26 +137,58 @@ export function VehicleDocumentsModal({
                 onChange={(event) => setExpiryDate(event.currentTarget.value)}
                 w={{ base: '100%', sm: 160 }}
               />
-              <FileInput
-                label="File"
-                placeholder="PDF or image"
-                value={file}
-                onChange={setFile}
-                accept="image/*,.pdf"
-                flex={1}
-              />
               <Button
                 leftSection={<IconUpload size={16} />}
                 onClick={handleUpload}
                 loading={uploadDocument.isPending}
-                disabled={!file}
+                disabled={!selectedFiles.length}
               >
                 Upload
               </Button>
             </Group>
-            {!file && (
+            <Stack gap="xs">
+              <Group justify="space-between" align="center">
+                <Text size="sm" fw={500}>
+                  Files
+                </Text>
+                <Tooltip label="Add another file">
+                  <ActionIcon
+                    variant="light"
+                    color="cyan"
+                    onClick={addFileRow}
+                    aria-label="Add another file"
+                  >
+                    <IconPlus size={16} />
+                  </ActionIcon>
+                </Tooltip>
+              </Group>
+              {fileRows.map((row, index) => (
+                <Group key={row.id} gap="xs" align="flex-end" wrap="nowrap">
+                  <FileInput
+                    placeholder={index === 0 ? 'PDF or image' : 'Additional PDF or image'}
+                    value={row.file}
+                    onChange={(file) => updateFileRow(row.id, file)}
+                    accept="image/*,.pdf"
+                    flex={1}
+                    aria-label={`Document file ${index + 1}`}
+                  />
+                  <Tooltip label="Remove file">
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      onClick={() => removeFileRow(row.id)}
+                      disabled={fileRows.length === 1}
+                      aria-label={`Remove document file ${index + 1}`}
+                    >
+                      <IconTrash size={17} />
+                    </ActionIcon>
+                  </Tooltip>
+                </Group>
+              ))}
+            </Stack>
+            {!selectedFiles.length && (
               <Alert color="gray" variant="light" icon={<IconAlertTriangle size={16} />}>
-                <Text size="sm">Select a PDF or image before uploading.</Text>
+                <Text size="sm">Select at least one PDF or image before uploading.</Text>
               </Alert>
             )}
           </Stack>

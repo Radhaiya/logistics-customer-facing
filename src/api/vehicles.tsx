@@ -43,27 +43,33 @@ export function useUploadVehicleDocument() {
       vehicleId,
       documentType,
       documentName,
-      file,
+      files,
       expiryDate,
       scope = 'tenant-vehicle',
     }: {
       vehicleId: number
       documentType: string
       documentName?: string
-      file: File
+      files: File[]
       expiryDate?: string
       scope?: VehicleDocumentScope
     }) => {
       const fd = new FormData()
       fd.append('documentType', documentType)
       if (documentName) fd.append('documentName', documentName)
-      fd.append('file', file)
+      files.forEach((file) => fd.append('files', file))
       if (expiryDate) fd.append('expiryDate', expiryDate)
-      return fetchJson<VehicleDocument>(`${getDocumentBase(vehicleId, scope)}/upload`, { method: 'POST', body: fd })
+      return fetchJson<VehicleDocument[]>(`${getDocumentBase(vehicleId, scope)}/upload/bulk`, { method: 'POST', body: fd })
     },
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ['vehicles', vars.scope ?? 'tenant-vehicle', vars.vehicleId, 'documents'] })
-      showNotification({ color: 'green', title: 'Uploaded', message: 'Document uploaded', icon: <IconCheck size={18} /> })
+      const count = vars.files.length
+      showNotification({
+        color: 'green',
+        title: 'Uploaded',
+        message: count === 1 ? 'Document uploaded' : `${count} documents uploaded`,
+        icon: <IconCheck size={18} />,
+      })
     },
     onError: (e: Error) => {
       showNotification({ color: 'red', title: 'Upload failed', message: getApiErrorMessage(e), icon: <IconX size={18} /> })
