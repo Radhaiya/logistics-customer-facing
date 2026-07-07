@@ -23,6 +23,7 @@ import {
   IconChevronRight,
   IconHome,
   IconLogout,
+  IconMapPin,
   IconMoon,
   IconShield,
   IconSun,
@@ -39,6 +40,7 @@ const allNavSections = [
     items: [
       { label: 'Dashboard', icon: IconHome, route: '/' },
       { label: 'Vehicles', icon: IconBuildingStore, route: '/vehicles' },
+      { label: 'Map', icon: IconMapPin, route: '/map' },
     ],
   },
   {
@@ -62,7 +64,10 @@ function getNavSections(module: AppModule) {
     return [
       {
         label: 'Fleet',
-        items: [{ label: 'Buses', icon: IconBus, route: '/buses' }],
+        items: [
+          { label: 'Buses', icon: IconBus, route: '/buses' },
+          { label: 'Map', icon: IconMapPin, route: '/map' },
+        ],
       },
     ]
   }
@@ -70,7 +75,10 @@ function getNavSections(module: AppModule) {
     return [
       {
         label: 'Fleet',
-        items: [{ label: 'Trucks', icon: IconTruck, route: '/trucks' }],
+        items: [
+          { label: 'Trucks', icon: IconTruck, route: '/trucks' },
+          { label: 'Map', icon: IconMapPin, route: '/map' },
+        ],
       },
     ]
   }
@@ -80,6 +88,7 @@ function getNavSections(module: AppModule) {
 const routeTitles: Record<string, string> = {
   '/': 'Dashboard',
   '/vehicles': 'Vehicles',
+  '/map': 'Map',
   '/buses': 'Buses',
   '/trucks': 'Trucks',
   '/users': 'Users',

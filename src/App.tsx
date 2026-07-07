@@ -5,6 +5,7 @@ import { Layout } from './components/Layout'
 import { Login } from './pages/Login'
 import { ModuleSelect } from './pages/ModuleSelect'
 import { VehicleSelection } from './pages/VehicleSelection'
+import { VehicleMap } from './pages/VehicleMap'
 import { Buses } from './pages/Buses'
 import { Trucks } from './pages/Trucks'
 import { UsersPage } from './pages/UsersPage'
@@ -36,6 +37,7 @@ export function App() {
             <Route element={<Layout />}>
               <Route path="/" element={<RootRedirect />} />
               <Route path="/vehicles" element={<VehicleSelection />} />
+              <Route path="/map" element={<VehicleMap />} />
               <Route path="/buses" element={<Buses />} />
               <Route path="/trucks" element={<Trucks />} />
               <Route path="/users" element={<UsersPage />} />

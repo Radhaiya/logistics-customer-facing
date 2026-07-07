@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { showNotification } from '@mantine/notifications'
 import { IconCheck, IconX } from '@tabler/icons-react'
 import { fetchJson, getApiErrorMessage } from './client'
-import type { Bus, Truck, VehicleDocument } from '../types'
+import type { Bus, Truck, VehicleCoordinates, VehicleDocument } from '../types'
 
 const BUS_BASE = '/api/buses'
 const TRUCK_BASE = '/api/trucks'
@@ -25,6 +25,15 @@ export function useTrucks() {
   return useQuery<Truck[]>({
     queryKey: ['trucks'],
     queryFn: () => fetchJson<Truck[]>(TRUCK_BASE) as Promise<Truck[]>,
+  })
+}
+
+export function useVehicleLocation(vehicleId: number | null) {
+  return useQuery<VehicleCoordinates>({
+    queryKey: ['vehicle-location', vehicleId],
+    queryFn: () => fetchJson<VehicleCoordinates>(`/api/vehicles/${vehicleId}/location`) as Promise<VehicleCoordinates>,
+    enabled: !!vehicleId,
+    refetchInterval: 5000,
   })
 }
 

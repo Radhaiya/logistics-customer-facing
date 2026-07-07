@@ -104,3 +104,9 @@ export interface VehicleDocument {
   createdAt: string
   updatedAt: string
 }
+
+export interface VehicleCoordinates {
+  latitude: number | null
+  longitude: number | null
+  recordedAt: string | null
+}

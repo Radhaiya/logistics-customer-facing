@@ -28,6 +28,8 @@ Environment templates are provided for each mode:
 
 Use `VITE_API_URL` only when the browser should call a backend origin directly. Leave it empty to use same-origin `/api/...` requests through the dev or Nginx proxy.
 
+Mapbox is production-only. Do not add `VITE_MAPBOX_ACCESS_TOKEN` to development or test env files; set it only from the production deploy environment.
+
 ## Production Build
 
 ```sh
@@ -54,5 +56,6 @@ For Docker builds, use `VITE_APP_ENV` and `VITE_API_URL` build args only when ov
 docker build \
   --build-arg VITE_APP_ENV=production \
   --build-arg VITE_API_URL= \
+  --build-arg VITE_MAPBOX_ACCESS_TOKEN="$VITE_MAPBOX_ACCESS_TOKEN" \
   -t customer-facing .
 ```
